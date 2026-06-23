@@ -74,7 +74,7 @@ function renderDeliverySummary() {
   const itemsHtml = cart
     .map((item) => `
       <div class="delivery-item">
-        <span>${item.title} x${item.quantity}</span>
+        <span>${item.title}${item.size ? ` (${item.size})` : ''} x${item.quantity}</span>
         <span>${formatCurrency(item.amount * item.quantity)}</span>
       </div>
     `)
@@ -154,6 +154,7 @@ function handleDeliverySubmit() {
         category: item.category,
         amount: item.amount,
         quantity: item.quantity,
+        size: item.size || '',
       })),
       shippingFee,
       delivery: {

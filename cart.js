@@ -32,6 +32,49 @@ function getProductImageClass(card) {
   ) || '';
 }
 
+function getAvailableSizes(title, category) {
+  const lowerTitle = title.toLowerCase();
+  const lowerCategory = category.toLowerCase();
+
+  const shoeTitleKeywords = [
+    'air force', 'air max', 'dunk', 'p-6000', 'jordan', 'vapor',
+    'blazer', 'cortex', 'stan smith', 'gazelle', 'samba', 'forum',
+    'superstar', 'nmd', 'ultraboost', 'yeezy',
+  ];
+
+  const isShoeByTitle = shoeTitleKeywords.some((keyword) =>
+    lowerTitle.includes(keyword)
+  );
+
+  if (
+    isShoeByTitle ||
+    lowerCategory.includes('basket') ||
+    lowerCategory.includes('chaussures')
+  ) {
+    return ['37', '38', '39', '40', '41', '42', '43', '44', '45', '46'];
+  }
+
+  const clothingKeywords = [
+    'sweat', 'jogging', 't-shirt', 'tee', 'polo', 'chemise', 'pull', 'gilet',
+    'veste', 'manteau', 'doudoune', 'short', 'ensemble', 'jean', 'pantalon',
+    'robe', 'jupe', 'haut', 'sans manche', 'bonnet', 'casquette',
+  ];
+
+  const isClothing =
+    clothingKeywords.some((keyword) => lowerTitle.includes(keyword)) ||
+    clothingKeywords.some((keyword) => lowerCategory.includes(keyword));
+
+  if (!isClothing) {
+    return [];
+  }
+
+  if (lowerTitle.includes('casquette') || lowerTitle.includes('bonnet')) {
+    return ['Taille unique'];
+  }
+
+  return ['S', 'M', 'L', 'XL'];
+}
+
 function getProductData(card) {
   const title = card.querySelector('.product-info h3')?.textContent?.trim() || 'Produit';
   const category = card.querySelector('.product-category')?.textContent?.trim() || 'Vêtement';
@@ -40,13 +83,16 @@ function getProductData(card) {
   const priceText = priceMatches.length ? priceMatches[priceMatches.length - 1] : '0';
   const amount = Math.max(1, Math.round(Number(priceText.replace(',', '.')) * 100));
   const imageClass = getProductImageClass(card);
+  const sizeSelector = card.querySelector('.size-selector');
+  const selectedSize = sizeSelector?.value || '';
 
   return {
-    id: [title, category, amount, imageClass].join('|'),
+    id: [title, category, amount, imageClass, selectedSize].join('|'),
     title,
     category,
     amount,
     imageClass,
+    size: selectedSize,
   };
 }
 
@@ -128,10 +174,33 @@ function updateCartBadge() {
   badge.textContent = String(getTotalQuantity(getCart()));
 }
 
+function createSizeSelector(card) {
+  const title = card.querySelector('.product-info h3')?.textContent?.trim() || '';
+  const category = card.querySelector('.product-category')?.textContent?.trim() || '';
+  const sizes = getAvailableSizes(title, category);
+
+  if (!sizes.length) {
+    return null;
+  }
+
+  const selector = document.createElement('select');
+  selector.className = 'size-selector';
+  selector.innerHTML = sizes
+    .map((size) => `<option value="${size}">${size}</option>`)
+    .join('');
+
+  return selector;
+}
+
 function injectAddButtons() {
   document.querySelectorAll('.product-card').forEach((card) => {
     const info = card.querySelector('.product-info');
     if (!info || info.querySelector('.buy-button')) return;
+
+    const sizeSelector = createSizeSelector(card);
+    if (sizeSelector) {
+      info.appendChild(sizeSelector);
+    }
 
     const button = document.createElement('button');
     button.type = 'button';
@@ -147,7 +216,7 @@ function renderEmptyCart(root) {
     <div class="cart-empty">
       <p class="eyebrow">Panier vide</p>
       <h2>Votre panier est vide</h2>
-      <p>Ajoutez des produits depuis les pages des marques ou depuis l’accueil.</p>
+      <p>Ajoutez des produits depuis les pages des marques ou depuis l'accueil.</p>
       <a class="btn-primary" href="index.html">Continuer les achats</a>
     </div>
   `;
@@ -173,7 +242,7 @@ function renderCartPage() {
             <div class="cart-item-top">
               <div>
                 <p class="product-category">${item.category}</p>
-                <h3>${item.title}</h3>
+                <h3>${item.title}${item.size ? ` <span class="item-size">— ${item.size}</span>` : ''}</h3>
               </div>
               <strong>${formatCurrency(item.amount)}</strong>
             </div>

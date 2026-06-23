@@ -71,6 +71,11 @@ app.post('/api/create-checkout-session', async (req, res) => {
     if (delivery?.estimate) metadata.delivery_estimate = delivery.estimate;
     if (delivery?.customer?.name) metadata.customer_name = delivery.customer.name;
     if (delivery?.customer?.city) metadata.customer_city = delivery.customer.city;
+    items.forEach((item, index) => {
+      if (item.size) {
+        metadata[`item_${index}_size`] = item.size;
+      }
+    });
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',

@@ -297,6 +297,41 @@ a {
   cursor: wait;
 }
 
+.size-selector {
+  margin-top: 0.75rem;
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #2a2a2a;
+  color: #f7f7f7;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23f7f7f7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+.size-selector:focus {
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.size-selector option {
+  background: #2a2a2a;
+  color: #f7f7f7;
+}
+
+.item-size {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .cart-launcher {
   position: fixed;
   right: 1.25rem;
